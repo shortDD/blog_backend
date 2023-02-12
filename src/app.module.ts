@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
-import { LoginModule } from './login/login.module';
-import { UserModule } from './user/user.module';
-import { BlogModule } from './blog/blog.module';
-import { CommentModule } from './comment/comment.module';
+import { UserModule } from './modules/user/user.module';
+import { BlogModule } from './modules/blog/blog.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { TagModule } from './modules/tag/tag.module';
+import { CommentModule } from './modules/comment/comment.module';
 import DatabaseConfig from './config/database';
+import { AuthModule } from './authGurd/auth.module';
+import { JwtGlobalModule } from './modules/jwt/jwt.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -20,10 +22,12 @@ import DatabaseConfig from './config/database';
       inject: [ConfigService],
       useFactory: (config) => config.get('database'),
     }),
-    LoginModule,
     UserModule,
     BlogModule,
     CommentModule,
+    TagModule,
+    AuthModule,
+    JwtGlobalModule,
   ],
 })
 export class AppModule {}

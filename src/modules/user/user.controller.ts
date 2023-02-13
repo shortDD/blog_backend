@@ -1,16 +1,6 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Query,
-  Req,
-} from '@nestjs/common';
-import { Roles } from 'src/authGurd/role.decorator';
+import { Controller, Get, Post, Body, Query } from '@nestjs/common';
 import { CreateUserInput } from './dto/create-user.dto';
+import { ProfileInput } from './dto/getProfile.dto';
 import { LoginInput } from './dto/login.dto';
 import { UserService } from './user.service';
 
@@ -28,9 +18,8 @@ export class UserController {
     return this.userService.login(loginInput);
   }
 
-  @Get('test')
-  @Roles('Client')
-  test() {
-    return 'role';
+  @Get('profile')
+  getProfile(@Query() profileInput: ProfileInput) {
+    return this.userService.getProfile(profileInput);
   }
 }

@@ -17,7 +17,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       code: status,
       success: false,
       path: req.url,
-      data: exception.getResponse(),
+      data: exception.message,
       timestamp: new Date().getTime(),
     });
   }

@@ -9,6 +9,7 @@ import {
   OneToMany,
   BeforeInsert,
   BeforeUpdate,
+  AfterLoad,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { InternalServerErrorException } from '@nestjs/common';
@@ -54,6 +55,12 @@ export class User extends CoreEntity {
   @OneToMany(() => Comment, (comment) => comment.commenter)
   comments: Comment[];
 
+  totalFollowers: number;
+
+  totalFollowings: number;
+
+  posts: number;
+
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword() {
@@ -64,6 +71,11 @@ export class User extends CoreEntity {
     }
   }
 
+  @AfterLoad()
+  computed() {
+    this.totalFollowers = this.followers.length;
+    this.totalFollowings = this.followings.length;
+  }
   async checkPassword(password: string): Promise<boolean> {
     try {
       const compare = await bcrypt.compare(password, this.password);

@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserInput } from './dto/create-user.dto';
+import { ProfileInput, ProfileOutput } from './dto/getProfile.dto';
 import { LoginInput, LoginOutput } from './dto/login.dto';
 import { User, UserRole } from './entities/user.entity';
 @Injectable()
@@ -48,7 +49,6 @@ export class UserService {
         where: { username },
         select: ['id', 'password', 'username'],
       });
-
       if (!user || !(await user.checkPassword(password))) {
         return {
           ok: false,
@@ -59,12 +59,36 @@ export class UserService {
         ok: true,
         token: this.jwtService.sign({
           username: user.username,
-          sub: user.id,
+          id: user.id,
         }),
       };
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException();
+    }
+  }
+  //获取个人信息 需登入
+  async getProfile({ id, username }: ProfileInput): Promise<ProfileOutput> {
+    try {
+      const user = await this.userRepository.findOne({
+        where: {
+          ...(id && { id }),
+          ...(username && { username }),
+        },
+        relations: { followers: true, followings: true },
+      });
+      if (!user) {
+        return {
+          ok: false,
+          error: '用户不存在',
+        };
+      }
+      return {
+        ok: true,
+        user,
+      };
+    } catch (e) {
+      console.log(e);
     }
   }
 }

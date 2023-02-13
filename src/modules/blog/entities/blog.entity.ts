@@ -24,6 +24,7 @@ export class Blog extends CoreEntity {
 
   @RelationId((blog: Blog) => blog.author)
   authorId: number;
+
   @Column({ length: 5000 })
   content: string;
 

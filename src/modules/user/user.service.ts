@@ -1,10 +1,12 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CoreOutput } from 'src/dto/core.dto';
 import { Repository } from 'typeorm';
 import { CreateUserInput } from './dto/create-user.dto';
 import { ProfileInput, ProfileOutput } from './dto/getProfile.dto';
 import { LoginInput, LoginOutput } from './dto/login.dto';
+import { UpdateUserInput } from './dto/update-user.dto';
 import { User, UserRole } from './entities/user.entity';
 @Injectable()
 export class UserService {
@@ -42,6 +44,30 @@ export class UserService {
       throw new InternalServerErrorException();
     }
   }
+  async editUser(
+    user: User,
+    { username, password, bio, avatar }: UpdateUserInput,
+  ): Promise<CoreOutput> {
+    try {
+      if (!user)
+        return {
+          ok: false,
+          error: '用户不存在',
+        };
+      await this.userRepository.update(user.id, {
+        ...(username && { username }),
+        ...(password && { password }),
+        ...(bio && { bio }),
+        ...(avatar && { avatar }),
+      });
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException();
+    }
+  }
   async login(loginInput: LoginInput): Promise<LoginOutput> {
     try {
       const { username, password } = loginInput;
@@ -68,7 +94,7 @@ export class UserService {
     }
   }
   //获取个人信息 需登入
-  async getProfile({ id, username }: ProfileInput): Promise<ProfileOutput> {
+  async userProfile({ id, username }: ProfileInput): Promise<ProfileOutput> {
     try {
       const user = await this.userRepository.findOne({
         where: {
@@ -90,5 +116,31 @@ export class UserService {
     } catch (e) {
       console.log(e);
     }
+  }
+
+  async follow(user: User, to: number) {
+    const toUser = await this.userRepository.findOne({ where: { id: to } });
+    if (!toUser) {
+      return {
+        ok: false,
+        error: '关注的用户不存在',
+      };
+    }
+    const fromUser = await this.userRepository.findOne({
+      where: { id: user.id },
+      relations: { followings: true },
+    });
+    const flag = fromUser.followings.some((user) => user.id === toUser.id);
+    if (flag) {
+      fromUser.followings = fromUser.followings.filter(
+        (user) => user.id !== toUser.id,
+      );
+    } else {
+      fromUser.followings.push(toUser);
+    }
+    await this.userRepository.save(fromUser);
+    return {
+      ok: true,
+    };
   }
 }

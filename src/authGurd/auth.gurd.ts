@@ -23,7 +23,7 @@ export class AuthGurd implements CanActivate {
     if (token) {
       const decoded = this.jwtService.verify(token);
       if (typeof decoded === 'object' && decoded.hasOwnProperty('id')) {
-        const { user } = await this.userService.getProfile({ id: decoded.id });
+        const { user } = await this.userService.userProfile({ id: decoded.id });
         if (user) {
           request.user = user;
           if (roles.includes('Any')) return true;

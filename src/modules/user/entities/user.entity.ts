@@ -71,16 +71,14 @@ export class User extends CoreEntity {
     }
   }
 
-  @AfterLoad()
-  computed() {
-    this.totalFollowers = this.followers.length;
-    this.totalFollowings = this.followings.length;
-  }
+  // @AfterLoad()
+  // computed() {
+  //   this.totalFollowers = this.followers?.length||0;
+  //   this.totalFollowings = this.followings?.length;
+  // }
   async checkPassword(password: string): Promise<boolean> {
     try {
       const compare = await bcrypt.compare(password, this.password);
-      console.log(compare);
-
       return compare;
     } catch (error) {
       console.log(error);

@@ -8,6 +8,7 @@ import { CommentModule } from './modules/comment/comment.module';
 import DatabaseConfig from './config/database';
 import { AuthModule } from './authGurd/auth.module';
 import { JwtGlobalModule } from './modules/jwt/jwt.module';
+import { UploadModule } from './modules/upload/upload.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -28,6 +29,7 @@ import { JwtGlobalModule } from './modules/jwt/jwt.module';
     TagModule,
     AuthModule,
     JwtGlobalModule,
+    UploadModule,
   ],
 })
 export class AppModule {}

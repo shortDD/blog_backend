@@ -3,13 +3,16 @@ import { Comment } from 'src/modules/comment/entities/comment.entity';
 import { Tag } from 'src/modules/tag/entities/tag.entity';
 import { User } from 'src/modules/user/entities/user.entity';
 import {
+  AfterLoad,
   Column,
   Entity,
   ManyToMany,
   ManyToOne,
   OneToMany,
+  OneToOne,
   RelationId,
 } from 'typeorm';
+import { Read } from './read.entity';
 
 @Entity()
 export class Blog extends CoreEntity {
@@ -31,9 +34,11 @@ export class Blog extends CoreEntity {
   @ManyToMany(() => Tag, (tag) => tag.blogs)
   tags: Tag[];
 
-  @Column({ default: 0 })
-  readNum: number;
-
   @OneToMany(() => Comment, (comment) => comment.blog)
   comments: [];
+
+  @OneToOne(() => Read, (read) => read.blog)
+  read: Read;
+
+  totalComments: number;
 }

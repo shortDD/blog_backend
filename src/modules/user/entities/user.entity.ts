@@ -49,7 +49,7 @@ export class User extends CoreEntity {
   @ManyToMany(() => User, (user) => user.followers)
   followings: User[];
 
-  @OneToMany(() => Blog, (blog) => blog.author)
+  @OneToMany(() => Blog, (blog) => blog.author, { nullable: true })
   blogs: Blog[];
 
   @OneToMany(() => Comment, (comment) => comment.commenter)

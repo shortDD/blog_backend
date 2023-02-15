@@ -1,42 +1,31 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
+import { AuthUser } from 'src/authGurd/auth-user.decorator';
+import { Roles } from 'src/authGurd/role.decorator';
+import { User } from '../user/entities/user.entity';
 import { BlogService } from './blog.service';
-import { CreateBlogDto } from './dto/create-blog.dto';
-import { UpdateBlogDto } from './dto/update-blog.dto';
+import { CreateBlogInput } from './dto/create-blog.dto';
 
 @Controller('blog')
 export class BlogController {
   constructor(private readonly blogService: BlogService) {}
 
-  @Post()
-  create(@Body() createBlogDto: CreateBlogDto) {
-    return this.blogService.create(createBlogDto);
+  @Post('create')
+  @Roles('Client')
+  create(@AuthUser() user: User, @Body() createBlogInput: CreateBlogInput) {
+    return this.blogService.createBlog(user, createBlogInput);
   }
 
+  @Get('detail')
+  blogDetail(@Query('id') id: number) {
+    return this.blogService.seeBlogById(id);
+  }
   @Get()
-  findAll() {
-    return this.blogService.findAll();
+  blogByTag(@Param('tagId') tagId: number) {
+    console.log(tagId);
+    return this.blogService.seeBlogByTag(tagId);
   }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.blogService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateBlogDto: UpdateBlogDto) {
-    return this.blogService.update(+id, updateBlogDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.blogService.remove(+id);
+  @Get('search')
+  blogByKeywords(@Param('keywords') keywords: string) {
+    return this.blogService.seeBlogByKeywords(keywords);
   }
 }

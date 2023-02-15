@@ -3,6 +3,7 @@ import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import {
   DataSource,
   EntitySubscriberInterface,
+  InsertEvent,
   LoadEvent,
   Repository,
 } from 'typeorm';
@@ -18,7 +19,10 @@ export class BlogEntitySubscriber implements EntitySubscriberInterface<Blog> {
   listenTo() {
     return Blog;
   }
-  afterLoad(entity: Blog, event?: LoadEvent<Blog>): void | Promise<any> {
-    console.log(entity);
+  // afterLoad(entity: Blog, event?: LoadEvent<Blog>): void | Promise<any> {
+  //   console.log(entity);
+  // }
+  beforeInsert(event: InsertEvent<Blog>): void | Promise<any> {
+    console.log(event);
   }
 }

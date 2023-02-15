@@ -15,7 +15,7 @@ export class Read {
   @Column({ default: 0 })
   readNum: number;
 
-  @OneToOne(() => Blog, (blog) => blog.read)
+  @OneToOne(() => Blog, (blog) => blog.read, { onDelete: 'CASCADE' })
   @JoinColumn()
   blog: Blog;
 }

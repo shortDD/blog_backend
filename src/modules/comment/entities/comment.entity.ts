@@ -8,9 +8,7 @@ export class Comment extends CoreEntity {
   @ManyToOne(() => User, (user) => user.comments)
   commenter: User;
 
-  @RelationId((comment: Comment) => comment.commenter)
-  commenterId: number;
-  @ManyToOne(() => Blog, (blog) => blog.comments)
+  @ManyToOne(() => Blog, (blog) => blog.comments, { onDelete: 'CASCADE' })
   blog: Blog;
 
   @RelationId((comment: Comment) => comment.blog)

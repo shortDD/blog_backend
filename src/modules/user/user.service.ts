@@ -101,7 +101,7 @@ export class UserService {
           ...(id && { id }),
           ...(username && { username }),
         },
-        relations: { followers: true, followings: true },
+        // relations: { followers: true, followings: true },
       });
       if (!user) {
         return {
@@ -115,6 +115,7 @@ export class UserService {
       };
     } catch (e) {
       console.log(e);
+      throw new InternalServerErrorException(e);
     }
   }
   //关注||取消 用户

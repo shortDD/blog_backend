@@ -13,6 +13,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const req: Request = ctx.getRequest();
     const res: Response = ctx.getResponse();
     const status = exception.getStatus();
+    console.log(exception.getResponse());
     res.status(status).json({
       code: status,
       success: false,

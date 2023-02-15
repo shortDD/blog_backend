@@ -3,7 +3,6 @@ import { UserModule } from './modules/user/user.module';
 import { BlogModule } from './modules/blog/blog.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TagModule } from './modules/tag/tag.module';
 import { CommentModule } from './modules/comment/comment.module';
 import DatabaseConfig from './config/database';
 import { AuthModule } from './authGurd/auth.module';
@@ -26,7 +25,6 @@ import { UploadModule } from './modules/upload/upload.module';
     UserModule,
     BlogModule,
     CommentModule,
-    TagModule,
     AuthModule,
     JwtGlobalModule,
     UploadModule,

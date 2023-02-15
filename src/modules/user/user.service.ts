@@ -117,7 +117,7 @@ export class UserService {
       console.log(e);
     }
   }
-
+  //关注||取消 用户
   async follow(user: User, to: number) {
     const toUser = await this.userRepository.findOne({ where: { id: to } });
     if (!toUser) {

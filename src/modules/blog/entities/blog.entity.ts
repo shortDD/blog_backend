@@ -3,7 +3,6 @@ import { Comment } from 'src/modules/comment/entities/comment.entity';
 import { Tag } from 'src/modules/tag/entities/tag.entity';
 import { User } from 'src/modules/user/entities/user.entity';
 import {
-  AfterLoad,
   Column,
   Entity,
   ManyToMany,

@@ -1,1 +1,1 @@
-export class CreateBlogDto {}
+export class CreateBlogInput {}

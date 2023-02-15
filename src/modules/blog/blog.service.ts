@@ -46,7 +46,6 @@ export class BlogService {
   //详情页查询
   async seeBlogById(id: number): Promise<CoreOutput & { blog?: Blog }> {
     try {
-      console.log(id);
       const blog = await this.blogRepository.findOne({
         where: { id },
         relations: ['read'],
@@ -95,7 +94,9 @@ export class BlogService {
       // });
       const [blogs, blogNum] = await this.blogRepository
         .createQueryBuilder()
-        .where('title Like :keywords OR ', { keywords })
+        .where('title Like :keywords OR foreword Like :keywords', {
+          keywords: `%${keywords}%`,
+        })
         .getManyAndCount();
       return {
         ok: true,

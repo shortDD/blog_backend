@@ -15,17 +15,16 @@ export class BlogController {
     return this.blogService.createBlog(user, createBlogInput);
   }
 
-  @Get('detail')
-  blogDetail(@Query('id') id: number) {
+  @Get('detail/:id')
+  blogDetail(@Param('id') id: number) {
     return this.blogService.seeBlogById(id);
   }
-  @Get()
-  blogByTag(@Param('tagId') tagId: number) {
-    console.log(tagId);
+  @Get('tag/:id')
+  blogByTag(@Param('id') tagId: number) {
     return this.blogService.seeBlogByTag(tagId);
   }
   @Get('search')
-  blogByKeywords(@Param('keywords') keywords: string) {
+  blogByKeywords(@Query('keywords') keywords: string) {
     return this.blogService.seeBlogByKeywords(keywords);
   }
 }

@@ -6,6 +6,12 @@ import { Repository } from 'typeorm';
 import { CreateUserInput } from './dto/create-user.dto';
 import { ProfileInput, ProfileOutput } from './dto/getProfile.dto';
 import { LoginInput, LoginOutput } from './dto/login.dto';
+import {
+  SeeFollowersInput,
+  SeeFollowersOutput,
+  SeeFollowingsInput,
+  SeeFollowingsOutput,
+} from './dto/seeFollow.dto';
 import { UpdateUserInput } from './dto/update-user.dto';
 import { User, UserRole } from './entities/user.entity';
 @Injectable()
@@ -15,7 +21,7 @@ export class UserService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async createUser(createUserInput: CreateUserInput) {
+  async createUser(createUserInput: CreateUserInput): Promise<CoreOutput> {
     try {
       const { username } = createUserInput;
       console.log(username);
@@ -119,7 +125,7 @@ export class UserService {
     }
   }
   //关注||取消 用户
-  async follow(user: User, to: number) {
+  async follow(user: User, to: number): Promise<CoreOutput> {
     const toUser = await this.userRepository.findOne({ where: { id: to } });
     if (!toUser) {
       return {
@@ -143,5 +149,66 @@ export class UserService {
     return {
       ok: true,
     };
+  }
+  //查看粉丝列表
+  async seeFollowers({
+    userId,
+    limit = 20,
+    page = 1,
+  }: SeeFollowersInput): Promise<SeeFollowersOutput> {
+    try {
+      const exist = await this.userRepository.findOne({
+        where: { id: userId },
+        select: ['id'],
+      });
+      if (!exist) {
+        return {
+          ok: false,
+          error: '用户不存在',
+        };
+      }
+      const followers = await this.userRepository.find({
+        where: { followings: { id: userId } },
+        take: limit,
+        skip: (page - 1) * limit,
+      });
+      return {
+        ok: true,
+        followers,
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+  //查看关注列表
+  async seeFollowings({
+    userId,
+    limit = 20,
+    page = 1,
+  }: SeeFollowingsInput): Promise<SeeFollowingsOutput> {
+    try {
+      console.log(limit);
+      const exist = await this.userRepository.findOne({
+        where: { id: userId },
+        select: ['id'],
+      });
+      if (!exist) {
+        return {
+          ok: false,
+          error: '用户不存在',
+        };
+      }
+      const followings = await this.userRepository.find({
+        where: { followers: { id: userId } },
+        take: limit,
+        skip: (page - 1) * limit,
+      });
+      return {
+        ok: true,
+        followings,
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
   }
 }

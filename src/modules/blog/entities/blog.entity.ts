@@ -10,6 +10,7 @@ import {
   ManyToOne,
   OneToMany,
   OneToOne,
+  RelationId,
 } from 'typeorm';
 import { Read } from './read.entity';
 import { Length } from 'class-validator';
@@ -21,9 +22,12 @@ export class Blog extends CoreEntity {
   @Column({ nullable: true })
   cover?: string;
 
-  @ManyToOne(() => User, (user) => user.blogs)
+  @ManyToOne(() => User, (user) => user.blogs, { eager: true })
   @JoinTable()
   author: User;
+
+  @RelationId((blog: Blog) => blog.author)
+  authorId: number;
 
   @Column({ length: 666 })
   @Length(10, 666)

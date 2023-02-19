@@ -4,6 +4,12 @@ import { CoreOutput } from 'src/dto/core.dto';
 import { Like, Repository } from 'typeorm';
 import { User } from '../user/entities/user.entity';
 import { CreateBlogInput, CreateBlogOutput } from './dto/create-blog.dto';
+import {
+  SeeBlogsByKeywordsInput,
+  SeeBlogsByTagInput,
+  SeeBlogsOutput,
+} from './dto/see-blog.dto';
+import { UpdateBlogInput } from './dto/update-blog.dto';
 import { Blog } from './entities/blog.entity';
 import { Read } from './entities/read.entity';
 import { Tag } from './entities/tag.entity';
@@ -38,9 +44,56 @@ export class BlogService {
       return {
         ok: true,
       };
-    } catch (erorr) {
-      console.log(erorr);
-      throw new InternalServerErrorException(erorr);
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(error);
+    }
+  }
+  //编辑博客
+  async editBlog(user: User, UpdateBlogInput: UpdateBlogInput) {
+    try {
+      const { blogId, data } = UpdateBlogInput;
+      let blog = await this.blogRepository.findOneBy({ id: blogId });
+      if (!blog || user.id != blog.authorId) {
+        return {
+          ok: false,
+          error: `博客不存在或没有权限编辑ID:${blogId}的博客`,
+        };
+      }
+      const tags = await this.createTag(data.tags);
+      console.log(tags);
+      await this.blogRepository.save(
+        this.blogRepository.create({ ...blog, ...data, tags }),
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+  //删除博客
+  async delBlog(user: User, blogId: number): Promise<CoreOutput> {
+    try {
+      const blog = await this.blogRepository.findOne({
+        where: { id: blogId },
+        relations: ['author'],
+      });
+      if (!blog) {
+        return {
+          ok: false,
+          error: '博客不存在',
+        };
+      }
+      if (user.id !== blog.authorId) {
+        return {
+          ok: false,
+          error: '无权限删除该博客',
+        };
+      }
+      await this.blogRepository.remove(blog);
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(error);
     }
   }
   //详情页查询
@@ -66,11 +119,15 @@ export class BlogService {
     }
   }
   //标签查询
-  async seeBlogByTag(tagId: number) {
+  async seeBlogsByTag({
+    tagId,
+    limit = 20,
+    page = 1,
+  }: SeeBlogsByTagInput): Promise<SeeBlogsOutput> {
     try {
       const tag = await this.tagRepository.findOne({
         where: { id: tagId },
-        relations: ['blogs'],
+        select: ['id'],
       });
       if (!tag) {
         return {
@@ -78,26 +135,35 @@ export class BlogService {
           error: '标签不存在',
         };
       }
+      const [blogs, blogNum] = await this.blogRepository.findAndCount({
+        where: { tags: { id: tag.id } },
+      });
       return {
         ok: true,
-        blogs: tag.blogs,
+        blogs,
+        blogNum,
       };
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
   }
   //模糊查询
-  async seeBlogByKeywords(keywords: string) {
+  async seeBlogsByKeywords({
+    keywords,
+    limit = 20,
+    page = 1,
+  }: SeeBlogsByKeywordsInput): Promise<SeeBlogsOutput> {
     try {
-      // const [blogs, blogNum] = await this.blogRepository.findAndCount({
-      //   where: { title: Like(`%${keywords}%`) },
-      // });
-      const [blogs, blogNum] = await this.blogRepository
-        .createQueryBuilder()
-        .where('title Like :keywords OR foreword Like :keywords', {
-          keywords: `%${keywords}%`,
-        })
-        .getManyAndCount();
+      const [blogs, blogNum] = await this.blogRepository.findAndCount({
+        where: [
+          {
+            title: Like(`%${keywords}%`),
+          },
+          {
+            foreword: Like(`%${keywords}%`),
+          },
+        ],
+      });
       return {
         ok: true,
         blogNum,

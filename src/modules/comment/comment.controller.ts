@@ -15,7 +15,7 @@ import {
   CreateCommentInput,
   CreateSubCommentInput,
 } from './dto/create-comment.dto';
-import { UpdateCommentDto } from './dto/update-comment.dto';
+import { EditCommentInput } from './dto/update-comment.dto';
 
 @Controller('comment')
 export class CommentController {
@@ -28,6 +28,12 @@ export class CommentController {
     @Body() createCommentInput: CreateCommentInput,
   ) {
     return this.commentService.create(user, createCommentInput);
+  }
+
+  @Post('edit')
+  @Roles('Client')
+  edit(@AuthUser() user: User, @Body() editCommentInput: EditCommentInput) {
+    return this.commentService.editComment(user, editCommentInput);
   }
 }
 @Controller('sub-comment')

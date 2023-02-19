@@ -8,7 +8,7 @@ import {
   CreateCommentInput,
   CreateSubCommentInput,
 } from './dto/create-comment.dto';
-import { UpdateCommentDto } from './dto/update-comment.dto';
+import { EditCommentInput } from './dto/update-comment.dto';
 import { Comment, SubComment } from './entities/comment.entity';
 
 @Injectable()
@@ -36,6 +36,33 @@ export class CommentService {
       await this.commentRepository.save(
         this.commentRepository.create({ blog, content, commenter: user }),
       );
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+  async editComment(
+    user: User,
+    { id, content }: EditCommentInput,
+  ): Promise<CoreOutput> {
+    try {
+      const comment = await this.commentRepository.findOneBy({ id });
+      if (!comment) {
+        return {
+          ok: false,
+          error: '评论不存在',
+        };
+      }
+      if (user.id !== comment.commenterId) {
+        return {
+          ok: false,
+          error: '无权限编辑评论',
+        };
+      }
+      comment.content = content;
+      await this.commentRepository.save(comment);
+      return {
+        ok: true,
+      };
     } catch (error) {
       throw new InternalServerErrorException(error);
     }

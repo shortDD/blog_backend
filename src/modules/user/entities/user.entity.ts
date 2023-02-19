@@ -1,6 +1,9 @@
 import { CoreEntity } from 'src/entities/core.entity';
 import { Blog } from 'src/modules/blog/entities/blog.entity';
-import { Comment } from 'src/modules/comment/entities/comment.entity';
+import {
+  Comment,
+  SubComment,
+} from 'src/modules/comment/entities/comment.entity';
 import {
   Entity,
   Column,
@@ -25,6 +28,7 @@ export class User extends CoreEntity {
   @IsNotEmpty({ message: '用户名不能为空' })
   @IsString({ message: '参数必须为字符串格式' })
   username: string;
+
   @IsNotEmpty({ message: '密码不能为空' })
   @Column({ select: false })
   password: string;
@@ -54,6 +58,9 @@ export class User extends CoreEntity {
 
   @OneToMany(() => Comment, (comment) => comment.commenter)
   comments: Comment[];
+
+  @OneToMany(() => SubComment, (subComment) => subComment.subCommenter)
+  subComments: SubComment[];
 
   totalFollowers: number;
 

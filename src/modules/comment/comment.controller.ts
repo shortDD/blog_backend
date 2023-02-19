@@ -1,34 +1,45 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { CommentService } from './comment.service';
-import { CreateCommentDto } from './dto/create-comment.dto';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
+import { AuthUser } from 'src/authGurd/auth-user.decorator';
+import { Roles } from 'src/authGurd/role.decorator';
+import { User } from '../user/entities/user.entity';
+import { CommentService, SubCommentService } from './comment.service';
+import {
+  CreateCommentInput,
+  CreateSubCommentInput,
+} from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 
 @Controller('comment')
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
-  @Post()
-  create(@Body() createCommentDto: CreateCommentDto) {
-    return this.commentService.create(createCommentDto);
+  @Post('create')
+  @Roles('Client')
+  create(
+    @AuthUser() user: User,
+    @Body() createCommentInput: CreateCommentInput,
+  ) {
+    return this.commentService.create(user, createCommentInput);
   }
+}
+@Controller('sub-comment')
+export class SubCommentController {
+  constructor(private readonly subCommentService: SubCommentService) {}
 
-  @Get()
-  findAll() {
-    return this.commentService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.commentService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
-    return this.commentService.update(+id, updateCommentDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.commentService.remove(+id);
+  @Post('create')
+  @Roles('Client')
+  create(
+    @AuthUser() user: User,
+    @Body() createSubCommentInput: CreateSubCommentInput,
+  ) {
+    return this.subCommentService.create(user, createSubCommentInput);
   }
 }

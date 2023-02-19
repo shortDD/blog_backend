@@ -1,5 +1,8 @@
 import { CoreEntity } from 'src/entities/core.entity';
-import { Comment } from 'src/modules/comment/entities/comment.entity';
+import {
+  Comment,
+  SubComment,
+} from 'src/modules/comment/entities/comment.entity';
 import { Tag } from 'src/modules/blog/entities/tag.entity';
 import { User } from 'src/modules/user/entities/user.entity';
 import {
@@ -42,7 +45,7 @@ export class Blog extends CoreEntity {
   tags: Tag[];
 
   @OneToMany(() => Comment, (comment) => comment.blog, { nullable: true })
-  comments: [];
+  comments?: Comment[];
 
   @OneToOne(() => Read, (read) => read.blog)
   read: Read;

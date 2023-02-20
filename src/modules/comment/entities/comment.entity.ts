@@ -6,7 +6,7 @@ import { Column, Entity, ManyToOne, OneToMany, RelationId } from 'typeorm';
 
 @Entity()
 export class Comment extends CoreEntity {
-  @ManyToOne(() => User, (user) => user.comments)
+  @ManyToOne(() => User, (user) => user.comments, { eager: true })
   commenter: User;
 
   @RelationId((comment: Comment) => comment.commenter)

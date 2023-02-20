@@ -8,7 +8,11 @@ import {
   CreateCommentInput,
   CreateSubCommentInput,
 } from './dto/create-comment.dto';
-import { EditCommentInput } from './dto/update-comment.dto';
+import { SeeCommentsInput, SeeCommentsOutput } from './dto/seeComments.dto';
+import {
+  EditCommentInput,
+  EditSubCommentInput,
+} from './dto/update-comment.dto';
 import { Comment, SubComment } from './entities/comment.entity';
 
 @Injectable()
@@ -21,7 +25,7 @@ export class CommentService {
     @InjectRepository(Blog)
     private readonly blogRepository: Repository<Blog>,
   ) {}
-  async create(
+  async createComment(
     user: User,
     { blogId, content }: CreateCommentInput,
   ): Promise<CoreOutput> {
@@ -67,6 +71,37 @@ export class CommentService {
       throw new InternalServerErrorException(error);
     }
   }
+  async seeComments({
+    blogId,
+    page = 1,
+    limit = 20,
+  }: SeeCommentsInput): Promise<SeeCommentsOutput> {
+    try {
+      const exist = await this.blogRepository.findOneBy({ id: blogId });
+      if (!exist) {
+        return {
+          ok: false,
+          error: '博客不存在',
+        };
+      }
+      const [comments, rootCommentNum] =
+        await this.commentRepository.findAndCount({
+          where: { blog: { id: blogId } },
+          take: limit,
+          skip: (page - 1) * limit,
+        });
+      const [] = await this.subCommentRepository.findAndCount({
+        where: {},
+      });
+      return {
+        ok: true,
+        comments,
+        commentNum: rootCommentNum,
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
 }
 
 @Injectable()
@@ -77,7 +112,7 @@ export class SubCommentService {
     @InjectRepository(SubComment)
     private readonly subCommentRepository: Repository<SubComment>,
   ) {}
-  async create(
+  async createSubComment(
     user: User,
     { rootCommentId, parentCommentId, content }: CreateSubCommentInput,
   ): Promise<CoreOutput> {
@@ -118,6 +153,33 @@ export class SubCommentService {
           }),
         );
       }
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+  async editSubComment(
+    user: User,
+    { id, content }: EditSubCommentInput,
+  ): Promise<CoreOutput> {
+    try {
+      const subComment = await this.subCommentRepository.findOneBy({ id });
+      if (!subComment) {
+        return {
+          ok: false,
+          error: '评论不存在',
+        };
+      }
+      if (user.id !== subComment.subCommenterId) {
+        return {
+          ok: false,
+          error: '无权限编辑评论',
+        };
+      }
+      subComment.content = content;
+      await this.subCommentRepository.save(subComment);
       return {
         ok: true,
       };

@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { AuthUser } from 'src/authGurd/auth-user.decorator';
 import { Roles } from 'src/authGurd/role.decorator';
@@ -15,7 +16,11 @@ import {
   CreateCommentInput,
   CreateSubCommentInput,
 } from './dto/create-comment.dto';
-import { EditCommentInput } from './dto/update-comment.dto';
+import { SeeCommentsInput } from './dto/seeComments.dto';
+import {
+  EditCommentInput,
+  EditSubCommentInput,
+} from './dto/update-comment.dto';
 
 @Controller('comment')
 export class CommentController {
@@ -27,13 +32,18 @@ export class CommentController {
     @AuthUser() user: User,
     @Body() createCommentInput: CreateCommentInput,
   ) {
-    return this.commentService.create(user, createCommentInput);
+    return this.commentService.createComment(user, createCommentInput);
   }
 
   @Post('edit')
   @Roles('Client')
   edit(@AuthUser() user: User, @Body() editCommentInput: EditCommentInput) {
     return this.commentService.editComment(user, editCommentInput);
+  }
+
+  @Get('see')
+  seeComments(@Query() seeCommentsInput: SeeCommentsInput) {
+    return this.commentService.seeComments(seeCommentsInput);
   }
 }
 @Controller('sub-comment')
@@ -46,6 +56,15 @@ export class SubCommentController {
     @AuthUser() user: User,
     @Body() createSubCommentInput: CreateSubCommentInput,
   ) {
-    return this.subCommentService.create(user, createSubCommentInput);
+    return this.subCommentService.createSubComment(user, createSubCommentInput);
+  }
+
+  @Post('edit')
+  @Roles('Client')
+  edit(
+    @AuthUser() user: User,
+    @Body() editSubCommentInput: EditSubCommentInput,
+  ) {
+    return this.subCommentService.editSubComment(user, editSubCommentInput);
   }
 }

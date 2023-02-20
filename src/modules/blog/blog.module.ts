@@ -7,9 +7,12 @@ import { Read } from './entities/read.entity';
 import { Tag } from './entities/tag.entity';
 import { User } from '../user/entities/user.entity';
 import { BlogEntitySubscriber } from './entity-subscriber';
+import { Comment, SubComment } from '../comment/entities/comment.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Blog, Read, Tag, User])],
+  imports: [
+    TypeOrmModule.forFeature([Blog, Read, Tag, User, Comment, SubComment]),
+  ],
   controllers: [BlogController],
   providers: [BlogService, BlogEntitySubscriber],
 })

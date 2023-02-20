@@ -51,4 +51,10 @@ export class Blog extends CoreEntity {
   read: Read;
 
   totalComments: number;
+
+  totalReads: number;
+
+  totalLikes: number;
+
+  totalMarks: number;
 }

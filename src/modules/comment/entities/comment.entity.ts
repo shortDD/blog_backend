@@ -23,6 +23,8 @@ export class Comment extends CoreEntity {
   })
   subComments?: SubComment[];
 
+  totalSubComments: number;
+
   @IsNotEmpty()
   @Column()
   @Length(5, 200)
@@ -31,7 +33,7 @@ export class Comment extends CoreEntity {
 
 @Entity()
 export class SubComment extends CoreEntity {
-  @ManyToOne(() => User, (user) => user.subComments)
+  @ManyToOne(() => User, (user) => user.subComments, { eager: true })
   subCommenter: User;
 
   @RelationId((subComment: SubComment) => subComment.subCommenter)

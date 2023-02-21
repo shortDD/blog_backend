@@ -9,5 +9,5 @@ export class SeeCommentsInput extends Pagination {
 export class SeeCommentsOutput extends CoreOutput {
   comments?: Comment[];
 
-  commentNum?: number;
+  totalComments?: number;
 }

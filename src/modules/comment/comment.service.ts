@@ -10,6 +10,10 @@ import {
 } from './dto/create-comment.dto';
 import { SeeCommentsInput, SeeCommentsOutput } from './dto/seeComments.dto';
 import {
+  SeeSubCommentsInput,
+  SeeSubCommentsOutput,
+} from './dto/seeSubComments.dto';
+import {
   EditCommentInput,
   EditSubCommentInput,
 } from './dto/update-comment.dto';
@@ -90,13 +94,44 @@ export class CommentService {
           take: limit,
           skip: (page - 1) * limit,
         });
-      const [] = await this.subCommentRepository.findAndCount({
-        where: {},
-      });
+      let totalComments = rootCommentNum;
+      for (let i = 0; i < comments.length; i++) {
+        const [subComments, count] =
+          await this.subCommentRepository.findAndCount({
+            where: { rootComment: { id: comments[i].id } },
+            take: 4,
+          });
+        comments[i].subComments = subComments;
+        comments[i].totalSubComments = count;
+        totalComments += count;
+      }
       return {
         ok: true,
         comments,
-        commentNum: rootCommentNum,
+        totalComments,
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+  async delComment(user: User, commentId: number): Promise<CoreOutput> {
+    try {
+      const comment = await this.commentRepository.findOneBy({ id: commentId });
+      if (!comment) {
+        return {
+          ok: false,
+          error: '评论不存在',
+        };
+      }
+      if (user.id !== comment.commenterId) {
+        return {
+          ok: false,
+          error: '无权限删除评论',
+        };
+      }
+      await this.commentRepository.delete({ id: commentId });
+      return {
+        ok: true,
       };
     } catch (error) {
       throw new InternalServerErrorException(error);
@@ -182,6 +217,59 @@ export class SubCommentService {
       await this.subCommentRepository.save(subComment);
       return {
         ok: true,
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+  async delSubComment(user: User, subCommentId: number): Promise<CoreOutput> {
+    try {
+      const subComment = await this.subCommentRepository.findOneBy({
+        id: subCommentId,
+      });
+      if (!subComment) {
+        return {
+          ok: false,
+          error: '评论不存在',
+        };
+      }
+      if (user.id !== subComment.subCommenterId) {
+        return {
+          ok: false,
+          error: '无权限删除评论',
+        };
+      }
+      await this.commentRepository.delete({ id: subCommentId });
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+  async seeSubComments({
+    rootCommentId,
+    limit = 10,
+    page = 1,
+  }: SeeSubCommentsInput): Promise<SeeSubCommentsOutput> {
+    try {
+      const exists = await this.commentRepository.findOneBy({
+        id: rootCommentId,
+      });
+      if (!exists) {
+        return {
+          ok: false,
+          error: '根评论不存在',
+        };
+      }
+      const subComments = await this.subCommentRepository.find({
+        where: { rootComment: { id: rootCommentId } },
+        take: limit,
+        skip: (page - 1) * limit,
+      });
+      return {
+        ok: true,
+        subComments,
       };
     } catch (error) {
       throw new InternalServerErrorException(error);

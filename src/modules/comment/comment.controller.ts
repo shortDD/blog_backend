@@ -17,6 +17,7 @@ import {
   CreateSubCommentInput,
 } from './dto/create-comment.dto';
 import { SeeCommentsInput } from './dto/seeComments.dto';
+import { SeeSubCommentsInput } from './dto/seeSubComments.dto';
 import {
   EditCommentInput,
   EditSubCommentInput,
@@ -45,6 +46,12 @@ export class CommentController {
   seeComments(@Query() seeCommentsInput: SeeCommentsInput) {
     return this.commentService.seeComments(seeCommentsInput);
   }
+
+  @Delete('del/:id')
+  @Roles('Client')
+  delComment(@AuthUser() user: User, @Param('id') id: number) {
+    return this.commentService.delComment(user, id);
+  }
 }
 @Controller('sub-comment')
 export class SubCommentController {
@@ -66,5 +73,16 @@ export class SubCommentController {
     @Body() editSubCommentInput: EditSubCommentInput,
   ) {
     return this.subCommentService.editSubComment(user, editSubCommentInput);
+  }
+
+  @Delete('del/:id')
+  @Roles('Client')
+  delComment(@AuthUser() user: User, @Param('id') id: number) {
+    return this.subCommentService.delSubComment(user, id);
+  }
+
+  @Get('see')
+  seeSubComments(@Query() seeSubCommentsInput: SeeSubCommentsInput) {
+    return this.subCommentService.seeSubComments(seeSubCommentsInput);
   }
 }

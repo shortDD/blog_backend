@@ -5,6 +5,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { UserEntitySubscriber } from './user-subscriber';
 import { Blog } from '../blog/entities/blog.entity';
+import {
+  ContextIdFactory,
+  NestApplicationContext,
+  REQUEST,
+} from '@nestjs/core';
 @Module({
   imports: [TypeOrmModule.forFeature([User, Blog])],
   controllers: [UserController],

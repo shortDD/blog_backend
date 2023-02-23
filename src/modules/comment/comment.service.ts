@@ -239,7 +239,7 @@ export class SubCommentService {
           error: '无权限删除评论',
         };
       }
-      await this.commentRepository.delete({ id: subCommentId });
+      await this.subCommentRepository.delete({ id: subCommentId });
       return {
         ok: true,
       };

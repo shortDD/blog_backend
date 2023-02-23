@@ -36,7 +36,6 @@ export class UserController {
   @Post('follow')
   @Roles('Client')
   followUser(@AuthUser() user: User, @Body('id') id: number) {
-    console.log(id);
     return this.userService.follow(user, id);
   }
 

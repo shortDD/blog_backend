@@ -9,6 +9,7 @@ import {
   SeeBlogsByTagInput,
   SeeBlogsOutput,
 } from './dto/see-blog.dto';
+import { SeeFeedInput, SeeFeedOutput } from './dto/seeFeed.dto';
 import { UpdateBlogInput } from './dto/update-blog.dto';
 import { Blog } from './entities/blog.entity';
 import { Read } from './entities/read.entity';
@@ -101,7 +102,6 @@ export class BlogService {
     try {
       const blog = await this.blogRepository.findOne({
         where: { id },
-        relations: ['read'],
       });
       if (!blog) {
         return {
@@ -109,6 +109,11 @@ export class BlogService {
           error: '未找到博客可能已经被删除',
         };
       }
+      const read = await this.readRepository.findOneBy({
+        blog: { id: blog.id },
+      });
+      read.readNum = read.readNum + 1;
+      await this.readRepository.save(read);
       return {
         ok: true,
         blog,
@@ -192,6 +197,26 @@ export class BlogService {
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(error);
+    }
+  }
+
+  async seeFeed({
+    limit = 20,
+    page = 1,
+  }: SeeFeedInput): Promise<SeeFeedOutput> {
+    try {
+      const [blogs, count] = await this.blogRepository.findAndCount({
+        take: limit,
+        skip: (page - 1) * limit,
+      });
+
+      return {
+        ok: true,
+        blogs,
+        totalBlogs: count,
+      };
+    } catch {
+      throw new InternalServerErrorException();
     }
   }
 }

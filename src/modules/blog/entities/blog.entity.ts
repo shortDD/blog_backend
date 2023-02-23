@@ -17,6 +17,7 @@ import {
 } from 'typeorm';
 import { Read } from './read.entity';
 import { Length } from 'class-validator';
+import { Like } from 'src/modules/like/entities/like.entity';
 @Entity()
 export class Blog extends CoreEntity {
   @Column()
@@ -50,11 +51,18 @@ export class Blog extends CoreEntity {
   @OneToOne(() => Read, (read) => read.blog)
   read: Read;
 
-  totalComments: number;
+  @OneToMany(() => Like, (like) => like.blog)
+  likes: Like[];
 
-  totalReads: number;
+  isLike: boolean = false;
 
-  totalLikes: number;
+  isMine: boolean = false;
 
-  totalMarks: number;
+  totalComments: number = 0;
+
+  totalReads: number = 0;
+
+  totalLikes: number = 0;
+
+  totalMarks: number = 0;
 }

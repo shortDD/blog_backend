@@ -17,6 +17,7 @@ import {
   SeeBlogsByKeywordsInput,
   SeeBlogsByTagInput,
 } from './dto/see-blog.dto';
+import { SeeFeedInput } from './dto/seeFeed.dto';
 import { UpdateBlogInput } from './dto/update-blog.dto';
 
 @Controller('blog')
@@ -51,5 +52,10 @@ export class BlogController {
   @Roles('Client')
   delBlog(@AuthUser() user: User, @Param('id') blogId: number) {
     return this.blogService.delBlog(user, blogId);
+  }
+
+  @Get('feed')
+  seeFeed(@Query() seeFeedInput: SeeFeedInput) {
+    return this.blogService.seeFeed(seeFeedInput);
   }
 }

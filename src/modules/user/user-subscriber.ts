@@ -1,7 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { REQUEST } from '@nestjs/core';
+import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-
+import { Request } from 'express';
+import { RequestContext } from 'nestjs-request-context';
+import { auth } from 'src/utils/auth';
 import {
   DataSource,
   EntitySubscriberInterface,
@@ -17,6 +19,7 @@ export class UserEntitySubscriber implements EntitySubscriberInterface<User> {
     @InjectDataSource() readonly connection: DataSource,
     @InjectRepository(Blog) private readonly blogRepository: Repository<Blog>,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private readonly jwtService: JwtService,
   ) {
     connection.subscribers.push(this);
   }
@@ -26,6 +29,9 @@ export class UserEntitySubscriber implements EntitySubscriberInterface<User> {
   }
 
   async afterLoad(user: User, event?: LoadEvent<User>) {
+    auth(this.jwtService, (id) => {
+      user.isMe = user.id === id;
+    });
     const { id, followers, followings } = user;
     if (followers || followings) {
       user.totalFollowers = followers.length;

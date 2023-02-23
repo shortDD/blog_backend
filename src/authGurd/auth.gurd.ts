@@ -1,5 +1,4 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { Observable } from 'rxjs';
 import { Reflector } from '@nestjs/core';
 import { AllowedRoles } from './role.decorator';
 import { Request } from 'express';
@@ -17,6 +16,7 @@ export class AuthGurd implements CanActivate {
       'roles',
       context.getHandler(),
     );
+
     if (!roles) return true;
     const request = context.switchToHttp().getRequest<Request>();
     const token = request.headers[process.env.TOKEN] as string;

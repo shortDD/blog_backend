@@ -17,6 +17,7 @@ import {
 import * as bcrypt from 'bcrypt';
 import { InternalServerErrorException } from '@nestjs/common';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Like } from 'src/modules/like/entities/like.entity';
 export enum UserRole {
   Visitor = 'Visitor',
   Client = 'Client',
@@ -62,11 +63,16 @@ export class User extends CoreEntity {
   @OneToMany(() => SubComment, (subComment) => subComment.subCommenter)
   subComments: SubComment[];
 
+  @OneToMany(() => Like, (like) => like.user)
+  likes: Like[];
+
   totalFollowers: number;
 
   totalFollowings: number;
 
   posts: number;
+
+  isMe: boolean = false;
 
   @BeforeInsert()
   @BeforeUpdate()

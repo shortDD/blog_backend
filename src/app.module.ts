@@ -8,6 +8,8 @@ import DatabaseConfig from './config/database';
 import { AuthModule } from './authGurd/auth.module';
 import { JwtGlobalModule } from './modules/jwt/jwt.module';
 import { UploadModule } from './modules/upload/upload.module';
+import { LikeModule } from './modules/like/like.module';
+import { RequestContextModule } from 'nestjs-request-context';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -28,6 +30,8 @@ import { UploadModule } from './modules/upload/upload.module';
     AuthModule,
     JwtGlobalModule,
     UploadModule,
+    LikeModule,
+    RequestContextModule,
   ],
 })
 export class AppModule {}

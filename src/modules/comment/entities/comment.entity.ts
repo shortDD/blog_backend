@@ -1,6 +1,7 @@
 import { IsNotEmpty, Length } from 'class-validator';
 import { CoreEntity } from 'src/entities/core.entity';
 import { Blog } from 'src/modules/blog/entities/blog.entity';
+import { Like } from 'src/modules/like/entities/like.entity';
 import { User } from 'src/modules/user/entities/user.entity';
 import { Column, Entity, ManyToOne, OneToMany, RelationId } from 'typeorm';
 
@@ -22,6 +23,15 @@ export class Comment extends CoreEntity {
     onDelete: 'SET NULL',
   })
   subComments?: SubComment[];
+
+  @OneToMany(() => Like, (like) => like.comment)
+  likes: Like[];
+
+  isLike: boolean = false;
+
+  isMine: boolean = false;
+
+  totalLikes: number = 0;
 
   totalSubComments: number;
 
@@ -59,6 +69,15 @@ export class SubComment extends CoreEntity {
     nullable: true,
   })
   replys?: SubComment[];
+
+  @OneToMany(() => Like, (like) => like.subComment)
+  likes: Like[];
+
+  isLike: boolean = false;
+
+  isMine: boolean = false;
+
+  totalLikes: number = 0;
 
   @IsNotEmpty()
   @Column()

@@ -33,17 +33,20 @@ export class Blog extends CoreEntity {
   @RelationId((blog: Blog) => blog.author)
   authorId: number;
 
-  @Column({ length: 666 })
-  @Length(10, 666)
-  foreword: string;
+  @Column({ nullable: true })
+  // @Length(10, 666)
+  foreword?: string;
 
-  @Column({ length: 5000 })
-  @Length(20, 5000)
-  html: string;
+  @Column({ length: 5000, nullable: true })
+  // @Length(20, 5000)
+  html?: string;
 
-  @ManyToMany(() => Tag, (tag) => tag.blogs, { eager: true })
+  @Column()
+  // 0：草稿 1 发布待审核 2审核通过 3审核失败
+  status: 0 | 1 | 2 | 3;
+  @ManyToMany(() => Tag, (tag) => tag.blogs, { eager: true, nullable: true })
   @JoinTable()
-  tags: Tag[];
+  tags?: Tag[];
 
   @OneToMany(() => Comment, (comment) => comment.blog, { nullable: true })
   comments?: Comment[];

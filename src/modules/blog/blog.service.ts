@@ -28,22 +28,26 @@ export class BlogService {
   ): Promise<CreateBlogOutput> {
     try {
       //处理标签
-      const { tags } = createBlogInput;
-      const tagEntities = await this.createTag(tags);
-      //创建阅读数量表单
+      // const { tags } = createBlogInput;
+      // const tagEntities = await this.createTag(tags);
       const read = new Read();
       read.readNum = 0;
-      read.blog = await this.blogRepository.save(
+      const blog = await this.blogRepository.save(
         this.blogRepository.create({
           ...createBlogInput,
-          tags: tagEntities,
+          // tags: tagEntities,
           author: user,
           read,
+          status: 0,
         }),
       );
+      read.blog = blog;
       await this.readRepository.save(read);
+      //创建阅读数量表单
+
       return {
         ok: true,
+        blogId: blog.id,
       };
     } catch (error) {
       console.log(error);
@@ -51,9 +55,10 @@ export class BlogService {
     }
   }
   //编辑博客
-  async editBlog(user: User, UpdateBlogInput: UpdateBlogInput) {
+  async editBlog(user: User, updateBlogInput: UpdateBlogInput) {
     try {
-      const { blogId, data } = UpdateBlogInput;
+      console.log(updateBlogInput);
+      const { blogId, data } = updateBlogInput;
       let blog = await this.blogRepository.findOneBy({ id: blogId });
       if (!blog || user.id != blog.authorId) {
         return {
@@ -61,10 +66,12 @@ export class BlogService {
           error: `博客不存在或没有权限编辑ID:${blogId}的博客`,
         };
       }
-      const tags = await this.createTag(data.tags);
-      console.log(tags);
+      let tags;
+      if (data.tags) {
+        tags = await this.createTag(data.tags);
+      }
       await this.blogRepository.save(
-        this.blogRepository.create({ ...blog, ...data, tags }),
+        this.blogRepository.create({ ...blog, ...data, ...(tags && { tags }) }),
       );
     } catch (error) {
       throw new InternalServerErrorException(error);
@@ -114,6 +121,30 @@ export class BlogService {
       });
       read.readNum = read.readNum + 1;
       await this.readRepository.save(read);
+      return {
+        ok: true,
+        blog,
+      };
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  async seeBlogById_Editor(
+    user: User,
+    id: number,
+  ): Promise<CoreOutput & { blog?: Blog }> {
+    try {
+      const blog = await this.blogRepository.findOne({
+        where: { id, author: { id: user.id } },
+      });
+      if (!blog) {
+        return {
+          ok: false,
+          error: '博客不存在或无权限编辑',
+        };
+      }
       return {
         ok: true,
         blog,

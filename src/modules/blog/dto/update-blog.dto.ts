@@ -9,4 +9,8 @@ export class UpdateBlogInput {
   data: updateBlogData;
 }
 
-class updateBlogData extends PartialType(CreateBlogInput) {}
+class updateBlogData extends PartialType(CreateBlogInput) {
+  tags?: string[];
+
+  status: 0 | 1 | 2 | 3;
+}

@@ -11,6 +11,6 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ResponseInterceptor());
   app.useGlobalPipes(new ValidationPipe());
   app.useStaticAssets(join(__dirname, 'modules/images'));
-  await app.listen(3000);
+  await app.listen(3001);
 }
 bootstrap();

@@ -9,9 +9,13 @@ export class CreateBlogInput extends PickType(Blog, [
   'html',
 ]) {
   // @IsNotEmptyObject({ nullable: false }, { message: '标签不能为空' })
-  tags: string[];
+  // tags?: string[];
+
+  blogId?: number;
 }
 
 export class CreateBlogOutput extends CoreOutput {
   blog?: Blog;
+
+  blogId?: number;
 }

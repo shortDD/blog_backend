@@ -32,6 +32,7 @@ export class BlogEntitySubscriber implements EntitySubscriberInterface<Blog> {
   }
 
   async afterLoad(blog: Blog, event?: LoadEvent<Blog>) {
+    console.log(blog);
     const { id: blogId } = blog;
     const [comments, commentCount] = await this.commentRepository.findAndCount({
       where: { blog: { id: blogId } },
@@ -44,10 +45,10 @@ export class BlogEntitySubscriber implements EntitySubscriberInterface<Blog> {
     });
     blog.totalComments = totalComments;
     //计算阅读数
-    const { readNum } = await this.readRepository.findOneBy({
+    const read = await this.readRepository.findOneBy({
       blog: { id: blogId },
     });
-    blog.totalReads = readNum;
+    blog.totalReads = read ? read.readNum : 0;
     //isMine
     await auth(this.jwtService, async (id) => {
       const like = await this.likeRepository.findOneBy({

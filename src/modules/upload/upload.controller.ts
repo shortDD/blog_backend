@@ -12,9 +12,10 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
 
-  @Post('avatar')
+  @Post()
   @UseInterceptors(FileInterceptor('file'))
   upload(@UploadedFile() file: Express.Multer.File) {
-    return { fileUrl: `http://localhost:3000/${file.filename}` };
+    console.log('#', file);
+    return { fileUrl: `http://localhost:3001/${file.filename}` };
   }
 }

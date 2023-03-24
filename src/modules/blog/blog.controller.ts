@@ -39,6 +39,15 @@ export class BlogController {
   blogDetail(@Param('id') id: number) {
     return this.blogService.seeBlogById(id);
   }
+  @Get('tags')
+  seeTags() {
+    return this.blogService.seeTags();
+  }
+  @Get('editor/:id')
+  @Roles('Client')
+  blogEditor(@Param('id') id: number, @AuthUser() user: User) {
+    return this.blogService.seeBlogById_Editor(user, id);
+  }
   @Get('tag/:id')
   blogByTag(@Query() sSeeBlogsByTagInput: SeeBlogsByTagInput) {
     return this.blogService.seeBlogsByTag(sSeeBlogsByTagInput);

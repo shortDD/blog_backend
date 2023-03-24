@@ -73,6 +73,9 @@ export class BlogService {
       await this.blogRepository.save(
         this.blogRepository.create({ ...blog, ...data, ...(tags && { tags }) }),
       );
+      return {
+        ok: true,
+      };
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
@@ -130,15 +133,17 @@ export class BlogService {
       throw new InternalServerErrorException(error);
     }
   }
-
+  // 编辑页获取博客信息
   async seeBlogById_Editor(
     user: User,
     id: number,
   ): Promise<CoreOutput & { blog?: Blog }> {
+    console.log(id, user.id);
     try {
       const blog = await this.blogRepository.findOne({
         where: { id, author: { id: user.id } },
       });
+      console.log(blog);
       if (!blog) {
         return {
           ok: false,
@@ -230,7 +235,19 @@ export class BlogService {
       throw new InternalServerErrorException(error);
     }
   }
-
+  // 获取标签
+  async seeTags() {
+    try {
+      const tags = await this.tagRepository.find();
+      return {
+        ok: true,
+        tags,
+      };
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(error);
+    }
+  }
   async seeFeed({
     limit = 20,
     page = 1,
